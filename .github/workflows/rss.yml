@@ -1,0 +1,27 @@
+name: RSS Aggregator
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Fetch feeds
+        run: |
+          npm install rss-parser
+          node build.js
+
+      - name: Commit
+        run: |
+          git config --global user.name "rss-bot"
+          git config --global user.email "rss@example.com"
+          git add feed.json
+          git commit -m "update feed" || exit 0
+          git push
